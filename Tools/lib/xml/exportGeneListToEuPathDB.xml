@@ -1,19 +1,37 @@
 <tool id="exportGeneListToEuPathDB" name="Gene List to VEuPathDB" version="1.0.0">
-  <description>Export a gene list to VEuPathDB</description>
+  <description>Export a gene list to VEuPathDB.</description>
   <command interpreter="python" detect_errors="aggressive">
-    ../../bin/exportGeneListToEuPathDB "$dataset_name" "$summary" "$description" "$__user_email__" "$__tool_directory__" "$output" "$overrideDbkey" "$input" "$input.metadata.dbkey" "$input.datatype"
+    ../../bin/exportGeneListToEuPathDB "$dataset_name" "$summary" "$description" "$__user_email__" "$__tool_directory__" "$output" "$overrideDbkey" "$input" "$input.name"
   </command>
+  
   <inputs>
     <param name="dataset_name" type="text" size="100" value=""
-           label="VEuPathDB dataset name:"
+           label="VEuPathDB Data Set name:"
            help="This name will allow you to readily identify and apply this dataset in VEuPathDB">
       <validator type="empty_field" />
       <validator type="regex" message="Only letters, numbers, spaces and dashes are allowed in the name.">^[\w\d\s\-]*$</validator>
       <validator type="length" message="Please restrict the name to 100 characters or less." max="100" />
     </param>
+    
+    <!--
+     multiple = false by default.  If the user select N files, the tool runs N times.  This is
+     a problem since the accompanying information will be the same each time.
+     -->
+    <param name="input" type="data" format="txt" label="Gene list to export:"
+	   help="Provide a single file containing only Gene IDs.  The IDs may be delimited by space, tab, newline, comma or semi-colon.">
+
+      <!--
+      This does not work with the older version of Galaxy that Globus uses.
+      <validator type="empty_dataset" />
+      -->
+    </param>
+
+    <param name="overrideDbkey" type="genomebuild" label="Representative Genome"
+           help="Choose a genome that represents your gene list.  It will be used to determine which VEuPathDB website to export to (eg PlasmoDB).  Your genes do not need to exclusively belong to that genome." />
+
     <param name="summary" type="text" value=""
-           label="VEuPathDB dataset summary:"
-           help="This summary will appear in your VEuPathDB dataset listing page. Note that any double quotes will be coverted to single quotes">
+           label="VEuPathDB Data Set summary:"
+           help="This summary will appear in your VEuPathDB My Datasets listing page. (Any double quotes will be coverted to single quotes.)">
       <validator type="empty_field" />
       <!--
         The summary may have any printable character with the exception that double quotes must be
@@ -28,9 +46,10 @@
         </mapping>
       </sanitizer>
     </param>
+    
     <param name="description" type="text" value="" area="True"
            label="VEuPathDB dataset description:"
-           help="This description is visible on the VEuPathDB dataset page reached via the dataset listing page.  Note that any double quotes will be coverted to single quotes" >
+           help="This description will appear on the VEuPathDB My Dataset details page.  (Any double quotes will be coverted to single quotes.)" >
       <validator type="empty_field" />
       <!--
         The description may have any printable character with the exception that double quotes must be
@@ -45,18 +64,7 @@
         </mapping>
       </sanitizer>
     </param>
-    <!--
-     multiple = false by default.  If the user select N files, the tool runs N times.  This is
-     a problem since the accompanying information will be the same each time.
-     -->
-    <param name="input" type="data" format="txt" label="Gene list to export:" >
-      <!--
-      This does not work with the older version of Galaxy that Globus uses.
-      <validator type="empty_dataset" />
-      -->
-    </param>
-    <!-- I consider this a very bad idea -->
-    <param name="overrideDbkey" type="genomebuild" label="Genome" />
+
   </inputs>
   <outputs>
       <data format="html" name="output" label="exportToVEuPathDBInfo.txt" />
@@ -66,12 +74,7 @@
 
 **What it does**
 
-This tool obtains a gene list and from that, creates a valid EuPathDB dataset that will be exported to one or
-more EuPathDB projects as per the user's project selection.
-
-You need to provide a name for the dataset so that you may easily identify it in EuPathDB websites, along with
-a description and a summary, the project to which the dataset applies and of course, a gene list. All inputs are
-required.
+The exported gene list will be integrated into VEuPathDB as a private dataset (in My Datasets), and be available in a suite of VEuPathDB tools.
 
 -----
 
@@ -84,10 +87,6 @@ Here is an example of a properly filled in form:
         :width: 500
 
 .. class:: warningmark
-
-We recommend that the user only supply one dataset file at a time. The tool can run in batch mode,
-but the datasets could be very difficult to distinguish in EuPathDB as all the other parameters above
-will apply to every dataset.
 
   </help>
   <citations>

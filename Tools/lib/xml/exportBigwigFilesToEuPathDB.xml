@@ -1,6 +1,6 @@
 <tool id="exportBigwigFilesToEuPathDB" name="Bigwig Files to VEuPathDB" version="1.0.0">
   
-<description>Export one or more bigwig files to VEuPathDB where they can be viewed as tracks in the Genome Browser.</description>
+<description>Export one or more Bigwig files to VEuPathDB where they can be viewed as tracks in the Genome Browser.</description>
   
 
   <command interpreter="python" detect_errors="aggressive">
@@ -17,8 +17,8 @@
   <inputs>
     
     <param name="dataset_name" type="text" size="100" value=""
-           label="My Data Set name:"
-           help="The export will create a new My Data Set in a VEuPathDB site. Specify the name for the new My Data Set.">
+           label="VEuPathDB Data Set name:"
+           help="This name will allow you to readily identify and apply this dataset in VEuPathDB">
       <validator type="empty_field" />
       <validator type="regex" message="Only letters, numbers, spaces and dashes are allowed in the name.">^[\w\d\s\-]*$</validator>
       <validator type="length" message="Please restrict the name to 100 characters or less." max="100" />
@@ -28,12 +28,12 @@
            help="Select the files to include in the new VEuPathDB My Data Set. The bigwig files you select here must be mapped to the reference genome that you select below.">
     </param>
 
-    <!-- I consider this a very bad idea -->
     <param name="overrideDbkey" type="genomebuild" label="Reference genome:" 
            help="The bigwig files you selected above must be mapped to the reference genome that you select here." />
     
     <param name="summary" type="text" value=""
-           label="My Data Set summary:">
+           label="VEuPathDB Data Set summary:"
+           help="This summary will appear in your VEuPathDB My Datasets listing page. (Any double quotes will be coverted to single quotes.)">
       <validator type="empty_field" />
       <!--
         The summary may have any printable character with the exception that double quotes must be
@@ -50,7 +50,8 @@
     </param>
     
     <param name="description" type="text" value="" area="True"
-           label="My Data Set description:">
+           label="VEuPathDB Data Set description:"
+           help="This description will appear on the VEuPathDB My Dataset details page.  (Any double quotes will be coverted to single quotes.)" >
       <validator type="empty_field" />
       <!--
         The description may have any printable character with the exception that double quotes must be
@@ -78,9 +79,7 @@
 
 **What it does**   (check this Tutorial_!)
 
-This tool exports one or more bigwig files to a VEuPathDB site creating a new My Data Set to contain them. Typically the bigwig files in your My Data Set should belong to one Study. The reference genome you specify determines which VEuPathDB site the new My Data Set will be exported to. For example, if you choose P.falciparum 3D7 the export will be sent to PlasmoDB.org_.
-
-More accurately, your new My Data Set will be available on any VEuPathDB site for you to share or download, but only in PlasmoDB you will be able to open the bigwig files as Genome Browser tracks, against any other publicly available PlasmoDB tracks.
+This tool exports one or more Bigwig files to a VEuPathDB site creating a new My Data Set to contain them. Typically the Bigwig files in your My Data Set should belong to one Study. The reference genome you specify determines which VEuPathDB site the new My Data Set will be exported to. For example, if you choose P.falciparum 3D7 the export will be sent to PlasmoDB.org.
 
 .. _PlasmoDB.org: http://plasmodb.org
 .. _Tutorial: http://www.youtube.com/watch?v=igQZHjRBqV0

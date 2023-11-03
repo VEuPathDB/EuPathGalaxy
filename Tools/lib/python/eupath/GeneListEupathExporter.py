@@ -1,49 +1,32 @@
-#!/usr/bin/python
-
 from . import EupathExporter
 from . import ReferenceGenome
+import sys
 
+class GeneListExporter(EupathExporter.Exporter):
 
-class GeneListExport(EupathExporter.Export):
-    """
-    This class is a specialized version of the Galaxy to EuPathDB dataset export tool.  This tool's
-    specialty is furnishing user's gene list data to EuPathDB.  As with all specialty export tools, this
-    tool implements 3 abstract classes.
-    """
-
-    # Name given to this type of dataset and to the expected file
     GENE_LIST_TYPE = "GeneList"
     GENE_LIST_VERSION = "1.0"
-    GENE_LIST_FILE = "genelist.txt"
+    UNSPECIFIED_REF_GENOME_KEY = "?"
 
-    # The validation script to be applied to the dataset files.  A failed validation should
-    # return in a system exit status of other than 0.
-    GENE_LIST_VALIDATION_SCRIPT = "validateGeneList"
+    def initialize(self, stdArgsBundle, typeSpecificArgsList):
 
-    def __init__(self, args):
-        """
-        Initializes the gene list export class with the parameters needed to accomplish the particular
-        type of export.
-        :param args: parameters provided from tool form
-        """
-        EupathExporter.Export.__init__(self,
-                                       GeneListExport.GENE_LIST_TYPE,
-                                       GeneListExport.GENE_LIST_VERSION,
-                                       GeneListExport.GENE_LIST_VALIDATION_SCRIPT,
-                                       args)
+        super().initialize(stdArgsBundle, GeneListExporter.GENE_LIST_TYPE, GeneListExporter.GENE_LIST_VERSION)
 
-        # For the gene list export, three parameters beyond generic 7 are required.
-        if len(args) < 10:
-            raise EupathExporter.ValidationException("The tool was passed an insufficient numbers of arguments.")
+        ##  TODO:  make this 2
+        if len(typeSpecificArgsList) != 3: 
+            print("The tool was passed an insufficient numbers of arguments.", file=sys.stderr)
+            exit(1)
 
-        # Data for the input given by the user
-        self._dataset_file_path = args[7]
-
-        # Overriding the dataset genome reference with that provided via the form.
-        if len(args[6].strip()) == 0:
-            raise EupathExporter.ValidationException("A reference genome must be selected.")
-        self._genome = ReferenceGenome.Genome(args[6])
-        self._datatype = args[9]
+        # Override the dataset genome reference with that provided via the form.
+        # (We need a ref genome in order to decide which project the gene list is for.  BUT... a gene list might
+        # contain genes from mulitple genomes)
+        refGenomeKey = typeSpecificArgsList[0]
+        if len(refGenomeKey.strip()) == 0 or refGenomeKey == GeneListExporter.UNSPECIFIED_REF_GENOME_KEY:
+            print("Please select a reference genome from the provided list.", file=sys.stderr)
+            exit(1);
+        self._genome = ReferenceGenome.Genome(refGenomeKey)
+        self._dataset_file_path = typeSpecificArgsList[1]
+        self._dataset_file_name = typeSpecificArgsList[2]
 
     def identify_dependencies(self):
         """
@@ -73,4 +56,4 @@ class GeneListExport(EupathExporter.Export):
         for such a file
         :return: A list containing the single dataset file accompanied by its EuPathDB designation.
         """
-        return [{"name": self.GENE_LIST_FILE, "path": self._dataset_file_path}]
+        return [{"name": self._dataset_file_name, "path": self._dataset_file_path}]

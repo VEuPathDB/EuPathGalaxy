@@ -1,4 +1,6 @@
 {
+  "service-url": "https://veupathdb.org/dataset-import/user-datasets"
+  "super-user-token": "sfischer%40upenn.edu-a-very-long-number"
   "url": "IRODS REST URL",
   "user": "IRODS USer",
   "password": "IRODS PWD"

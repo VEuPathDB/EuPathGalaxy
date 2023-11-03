@@ -1,36 +1,18 @@
 <tool id="exportRnaSeqToEuPathDB" name="RNA-Seq to VEuPathDB" version="1.0.0">
   
-<description>Export an RNA-Seq result to VEuPathDB</description>
+<description>Export an RNA-Seq result to VEuPathDB.</description>
   
   <command interpreter="python" detect_errors="aggressive">
     <![CDATA[
-    ../../bin/exportRnaSeqToEuPathDB "$dataset_name" "$summary" "$description" "$__user_email__" "$__tool_directory__" "$output" "$summary" "$double"
+    ../../bin/exportRnaSeqToEuPathDB "$dataset_name" "$summary" "$description" "$__user_email__" "$__tool_directory__" "$output"
 
-    #if $double == "unstranded":
+    #for $key in $fpkm_collection.keys()
+      "$fpkm_collection[$key]" "$key" "$fpkm_collection[$key].metadata.dbkey" txt
+    #end for
 
-      #for $key in $bigwig_collection.keys()
-        "$bigwig_collection[$key]" "$key" "$bigwig_collection[$key].metadata.dbkey" bw
-      #end for
-
-      #for $key in $fpkm_collection.keys()
-        "$fpkm_collection[$key]" "$key" "$fpkm_collection[$key].metadata.dbkey" txt
-      #end for
-
-    #else:
-
-      #for $key in $bigwig_collection.keys()
-        #for $subkey in $bigwig_collection[$key].keys()
-          "$bigwig_collection[$key][$subkey]" "$key-$subkey" "$bigwig_collection[$key][$subkey].metadata.dbkey" bw
-        #end for
-      #end for
-
-      #for $key in $fpkm_collection.keys()
-        #for $subkey in $fpkm_collection[$key].keys()
-          "$fpkm_collection[$key][$subkey]" "$key-$subkey" "$fpkm_collection[$key][$subkey].metadata.dbkey" txt
-        #end for
-      #end for
-
-    #end if
+    #for $key in $bigwig_collection.keys()
+      "$bigwig_collection[$key]" "$key" "$bigwig_collection[$key].metadata.dbkey" bw
+    #end for
 
     ]]>
     
@@ -39,28 +21,25 @@
   <inputs>
     
     <param name="dataset_name" type="text" size="100" value=""
-           label="My Data Set name:"
-           help="specify a name for the new dataset">
+           label="VEuPathDB Data Set name:"
+           help="This name will allow you to readily identify and apply this dataset in VEuPathDB">
       <validator type="empty_field" />
       <validator type="regex" message="Only letters, numbers, spaces and dashes are allowed in the name.">^[\w\d\s\-]*$</validator>
       <validator type="length" message="Please restrict the name to 100 characters or less." max="100" />
     </param>
 
-    <param label="Are you exporting sense and antisense TPM/FPKM datasets?" help="Select yes if your experiment is strand-specific and you are including sense and antisense datasets in this export." name="double" type="select">
-      <option selected="true" value="unstranded">No</option>
-      <option value="stranded">Yes</option>
+    <param name="fpkm_collection" type="data_collection" collection_type="list" multiple="true" label="TPM or FPKM collection:" format="tabular"
+           help="Select a collection of FPKM or TPM files to include in the export. Each file in the collection should be a two column tab-delimited file where the first column contains gene ids, and the second column contains normalized counts for each gene, either FPKM or TPM.  The first line must have column headings 'gene_id' and either 'FPKM' or 'TMP.
+">
     </param>
 
-    <param name="bigwig_collection" type="data_collection" multiple="true" label="BigWig collection:" format="bigwig"
-           help="Select the BigWig collection to include in the new VEuPathDB My Data Set. The BigWig collection you select here must be mapped to the reference genome that you select below.">
-    </param>
-
-    <param name="fpkm_collection" type="data_collection" multiple="true" label="TPM or FPKM collection:" format="tabular"
-           help="Select the TPM or FPKM collection. For an unstranded dataset, its name should include the phrase 'gene expression'.">
+    <param name="bigwig_collection" type="data_collection" collection_type="list" multiple="true" label="BigWig collection:" format="bigwig"
+           help="Select a collection of bigwig files to include in the export.">
     </param>
 
     <param name="summary" type="text" value=""
-           label="My Data Set summary:">
+           label="VEuPathDB Data Set summary:"
+	   help="This summary will appear in your VEuPathDB My Datasets listing page. (Any double quotes will be coverted to single quotes.)">
       <validator type="empty_field" />
       <!--
         The summary may have any printable character with the exception that double quotes must be
@@ -77,7 +56,8 @@
     </param>
     
     <param name="description" type="text" value="" area="True"
-           label="My Data Set description:">
+           label="VEuPathDB Data Set description:"
+	   help="This description will appear on the VEuPathDB My Dataset details page.  (Any double quotes will be coverted to single quotes.)">
       <validator type="empty_field" />
       <!--
         The description may have any printable character with the exception that double quotes must be
@@ -105,7 +85,7 @@
 
 **What it does**   (check this Tutorial_!)
 
-This tool exports an RNA-Seq result to a VEuPathDB site creating a new My Data Set to contain them.
+The exported result will be integrated into VEuPathDB as a private dataset (in My Datasets), and be available in a suite of VEuPathDB tools.  Include in the export one or more FPKM/TPM files (required) and one or more Bigwig files (optional). TPM or FPKM files should represent normalized counts of the number of reads mapped to each gene. Bigwig files should represent coverage of aligned reads across the genome. All included files must be mapped to the same reference genome.
 
 .. _PlasmoDB.org: http://plasmodb.org
 .. _Tutorial: http://www.youtube.com/watch?v=igQZHjRBqV0
